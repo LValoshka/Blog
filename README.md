@@ -1,1 +1,2 @@
 # Blog
+Simple REST application
