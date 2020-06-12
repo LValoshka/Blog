@@ -7,6 +7,7 @@ import com.example.blog.model.User;
 import com.example.blog.repository.ArticleRepository;
 import com.example.blog.repository.UserRepository;
 import com.example.blog.service.interfaces.ArticleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
@@ -26,7 +28,6 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
     }
-
 
     @Override
     public List<Article> findAllByStatus(Status status) throws ResourceNotFoundException {
@@ -45,6 +46,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (article.getAuthor().getId() == getCurrentUser().getId()) {
             articleRepository.delete(article);
         } else {
+            log.error("No user with such id");
             //throw Exception?
         }
 
@@ -61,6 +63,7 @@ public class ArticleServiceImpl implements ArticleService {
             article.setStatus(newArticle.getStatus());
             return articleRepository.save(article);
         } else {
+            log.error("No user with such id");
             return null;
         }
     }
