@@ -14,7 +14,7 @@ public class UserRegistrationDTO {
     private String password;
     private String email;
 
-    public User convertDTOtoUser() {
+    public User createUserFromDTO() {
         return User.builder()
                 .firstName(firstName)
                 .lastName(lastName)
