@@ -1,6 +1,8 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.UserAuthenticationDTO;
+import com.example.blog.dto.UserEmailDto;
+import com.example.blog.dto.UserPasswordDto;
 import com.example.blog.dto.UserRegistrationDTO;
 import com.example.blog.exception.ResourceNotFoundException;
 import com.example.blog.model.Article;
@@ -54,9 +56,23 @@ public class UserController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/confirm/{code}")
+    @GetMapping(value = "/auth/confirm/{code}")
     public ResponseEntity<?> confirmEmail(@PathVariable String code) throws ResourceNotFoundException {
         userService.confirmEmail(code);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/forgot_password")
+    public ResponseEntity<?> forgotPassword(@RequestBody UserEmailDto userEmailDto) {
+        userService.sendEmailToRestorePassword(userEmailDto.getEmail());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/auth/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody UserPasswordDto userPasswordDto) throws ResourceNotFoundException {
+        userService.resetPassword(userPasswordDto.getCode(), userPasswordDto.getPassword());
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

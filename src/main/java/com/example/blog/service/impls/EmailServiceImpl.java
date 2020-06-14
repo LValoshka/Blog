@@ -13,8 +13,6 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String senderEmail;
 
-    private static final String URL_CONFIRM_REGISTRATION = "http://localhost:8080/auth/confirm/";
-
     private final JavaMailSender javaMailSender;
 
     public EmailServiceImpl(JavaMailSender javaMailSender) {
@@ -22,12 +20,12 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendMessageByEmail(String recipientEmail, String code) {
+    public void sendMessageByEmail(String recipientEmail, String url, String code) {
         log.info("---In sending email---");
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(senderEmail);
         simpleMailMessage.setTo(recipientEmail);
-        simpleMailMessage.setText("Confirm your registration by clicking this link: " + URL_CONFIRM_REGISTRATION + code);
+        simpleMailMessage.setText("Confirm your registration by clicking this link: " + url + code);
         javaMailSender.send(simpleMailMessage);
     }
 }

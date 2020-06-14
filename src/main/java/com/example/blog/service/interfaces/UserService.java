@@ -21,4 +21,8 @@ public interface UserService {
     void register(User user);
 
     void confirmEmail(String code) throws ResourceNotFoundException;
+
+    void sendEmailToRestorePassword(String email);
+
+    void resetPassword(String code, String password) throws ResourceNotFoundException;
 }

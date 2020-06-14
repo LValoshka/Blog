@@ -20,10 +20,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
     private static final String REDIS_KEY_AUTH = "Auth";
+    private static final String REDIS_KEY_RESET = "Reset";
+    private static final String URL_CONFIRM_REGISTRATION = "http://localhost:8080/auth/confirm/";
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails);
         redisRepository.saveCode(REDIS_KEY_AUTH, user.getUsername(), token);
-        emailService.sendMessageByEmail(user.getUsername(), token);
+        emailService.sendMessageByEmail(user.getUsername(), URL_CONFIRM_REGISTRATION, token);
     }
 
     @Override
@@ -99,6 +102,28 @@ public class UserServiceImpl implements UserService {
         notActiveUser.setActive(true);
         userRepository.save(notActiveUser);
         redisRepository.deleteCode(REDIS_KEY_AUTH, email);
+    }
+
+    @Override
+    public void sendEmailToRestorePassword(String email) {
+        String code = UUID.randomUUID().toString();
+        redisRepository.saveCode(REDIS_KEY_RESET, email, code);
+        emailService.sendMessageByEmail(email, "", code);
+    }
+
+    @Override
+    public void resetPassword(String code, String password) throws ResourceNotFoundException {
+        String email = (String) redisRepository.findAllCodes(REDIS_KEY_RESET).entrySet()
+                .stream()
+                .filter(entry -> code.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        User userWithOldPassword = userRepository.findByUsername(email).orElse(null);
+        userWithOldPassword.setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save(userWithOldPassword);
+        redisRepository.deleteCode(REDIS_KEY_RESET, email);
     }
 
     private User getCurrentUser() {
