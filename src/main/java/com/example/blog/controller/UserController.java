@@ -41,11 +41,6 @@ public class UserController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/my", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Set<Article>> getArticles() {
-        return new ResponseEntity<>(userService.getUsersArticles(), HttpStatus.OK);
-    }
-
     @PostMapping(value = "/auth/signIn", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserAuthenticationDTO userAuthenticationDTO) {
         User user = userService.findByUsername(userAuthenticationDTO.getEmail());

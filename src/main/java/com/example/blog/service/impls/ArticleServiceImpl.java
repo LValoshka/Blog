@@ -9,8 +9,6 @@ import com.example.blog.repository.UserRepository;
 import com.example.blog.service.interfaces.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +39,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
-    public void deleteById(int id) throws ResourceNotFoundException {
-        Article article = articleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Article not found"));
-        if (article.getAuthor().getId() == getCurrentUser().getId()) {
+    public void deleteArticle(String email, Article article) {
+        User user = userRepository.findByUsername(email).orElse(null);
+
+        if (article.getAuthor().equals(user)) {
             articleRepository.delete(article);
         } else {
             log.error("No user with such id");
@@ -54,9 +53,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
-    public Article update(int id, Article newArticle) throws ResourceNotFoundException {   //rewrite???
-        Article article = articleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Article not found"));
-        if (article.getAuthor().getId() == getCurrentUser().getId()) {
+    public Article update(Article article, String email, Article newArticle) {
+        User user = userRepository.findByUsername(email).orElse(null);
+
+        if (article.getAuthor().equals(user)) {
             article.setTitle(newArticle.getTitle());
             article.setText(newArticle.getText());
             article.setTagSet(newArticle.getTagSet());
@@ -68,9 +68,9 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUsername(username).orElse(null);
+    @Override
+    public List<Article> getUsersArticles(String email) {
+        User user = userRepository.findByUsername(email).orElse(null);
+        return articleRepository.findAllByAuthor(user).orElse(null);
     }
 }

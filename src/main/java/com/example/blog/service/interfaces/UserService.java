@@ -14,8 +14,6 @@ public interface UserService {
 
     User findByActive(boolean active) throws ResourceNotFoundException;
 
-    Set<Article> getUsersArticles();
-
     void auth(String email);
 
     void register(User user);
