@@ -8,7 +8,6 @@ import com.example.blog.security.JwtTokenUtil;
 import com.example.blog.service.interfaces.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,7 +15,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Controller
+@RestController
 @RequestMapping("/articles")
 public class CommentController {
     private JwtTokenUtil jwtTokenUtil;
