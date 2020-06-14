@@ -20,7 +20,7 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private int jwtExpiration;
 
-    String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
