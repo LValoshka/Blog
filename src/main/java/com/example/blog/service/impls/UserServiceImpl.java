@@ -1,7 +1,6 @@
 package com.example.blog.service.impls;
 
 import com.example.blog.exception.ResourceNotFoundException;
-import com.example.blog.model.Article;
 import com.example.blog.model.User;
 import com.example.blog.repository.RedisRepository;
 import com.example.blog.repository.UserRepository;
@@ -19,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -65,12 +63,6 @@ public class UserServiceImpl implements UserService {
     public User findByActive(boolean active) throws ResourceNotFoundException {
         return userRepository.findByActive(true).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
-
-    @Override
-    public Set<Article> getUsersArticles() {
-        return getCurrentUser().getArticleSet();  //TO DO: rewrite!!!
-    }
-
 
     @Override
     public void auth(String email) {
@@ -126,9 +118,4 @@ public class UserServiceImpl implements UserService {
         redisRepository.deleteCode(REDIS_KEY_RESET, email);
     }
 
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepository.findByUsername(username).orElse(null);
-    }
 }

@@ -12,7 +12,9 @@ public interface ArticleService {
 
     Article save(Article article);
 
-    void deleteById(int id) throws ResourceNotFoundException;
+    void deleteArticle(String email, Article article);
 
-    Article update(int id, Article newArticle) throws ResourceNotFoundException;
+    Article update(Article article, String email, Article newArticle);
+
+    List<Article> getUsersArticles(String email);
 }
