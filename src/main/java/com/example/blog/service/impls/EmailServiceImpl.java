@@ -25,7 +25,8 @@ public class EmailServiceImpl implements EmailService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(senderEmail);
         simpleMailMessage.setTo(recipientEmail);
-        simpleMailMessage.setText("Confirm your registration by clicking this link: " + url + code);
+        simpleMailMessage.setSubject("Activate blog");
+        simpleMailMessage.setText("Good day!\n Please, confirm your registration by clicking this link: " + url + code);
         javaMailSender.send(simpleMailMessage);
     }
 }

@@ -5,7 +5,6 @@ import com.example.blog.dto.UserEmailDto;
 import com.example.blog.dto.UserPasswordDto;
 import com.example.blog.dto.UserRegistrationDTO;
 import com.example.blog.exception.ResourceNotFoundException;
-import com.example.blog.model.Article;
 import com.example.blog.model.User;
 import com.example.blog.service.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Set;
 
 @Slf4j
 @RestController
