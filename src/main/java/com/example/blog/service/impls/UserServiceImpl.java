@@ -7,6 +7,7 @@ import com.example.blog.repository.UserRepository;
 import com.example.blog.security.JwtTokenUtil;
 import com.example.blog.service.interfaces.EmailService;
 import com.example.blog.service.interfaces.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private static final String REDIS_KEY_AUTH = "Auth";
@@ -67,11 +69,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void auth(String email) {
         User user = findByUsername(email);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails);
+        //   String token = UUID.randomUUID().toString();
         redisRepository.saveCode(REDIS_KEY_AUTH, user.getUsername(), token);
         emailService.sendMessageByEmail(user.getUsername(), URL_CONFIRM_REGISTRATION, token);
     }
@@ -84,13 +87,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void confirmEmail(String code) throws ResourceNotFoundException {
+        log.info("---In confirmEmail() method---");
         String email = (String) redisRepository.findAllCodes(REDIS_KEY_AUTH).entrySet()
                 .stream()
                 .filter(entry -> code.equals(entry.getValue()))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        User notActiveUser = userRepository.findByUsername(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User notActiveUser = userRepository.findByUsername(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         notActiveUser.setActive(true);
         userRepository.save(notActiveUser);
         redisRepository.deleteCode(REDIS_KEY_AUTH, email);

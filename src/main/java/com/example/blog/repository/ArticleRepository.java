@@ -17,5 +17,5 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 
     Optional<List<Article>> findAllByAuthor(User user);
 
-    Optional<List<Article>> findAllByTagSet(Set<Tag> tags);
+    Optional<Set<Article>> findAllByTagSetIn(Set<Tag> tags);
 }
